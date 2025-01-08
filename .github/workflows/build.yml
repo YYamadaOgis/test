@@ -40,6 +40,8 @@ jobs:
         id: build-image
         run: |
           docker compose -f docker-compose.yml build
+          docker compose images
+          docker compose images | awk 'NR>1 {print $2} 
           IMAGEINFO=$(docker compose images | awk 'NR>1 {print $2}') 
           echo "IMAGEINFO=$IMAGEINFO" >> $GITHUB_ENV
       # add tags docker image 
