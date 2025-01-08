@@ -20,13 +20,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
+        env:
+          OWNER: '${{ github.repository_owner }}'
       # generate tags from pull request comments
       - name: Geterate Tags From PR Comments
         id: pr-comment
         run: |
           PRCOM=$(echo "$PULL_REQUEST_BODY" | grep -Po '(?<=tag: )v\d+\.\d+\.\d+')
-          echo "TAG1=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_ENV
-          echo "TAG2=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:$PRCOM" >> $GITHUB_ENV
+          echo "TAG1=ghcr.io/$OWNER_LC/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_ENV
+          echo "TAG2=ghcr.io/$OWNER_LC/${{ env.IMAGE_NAME }}:$PRCOM" >> $GITHUB_ENV
 
       # login ghcr
       - name: login to ghcr
@@ -55,4 +60,4 @@ jobs:
       - name: push docker image
         id: push-image
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}      
+          docker push ghcr.io/$OWNER_LC/${{ env.IMAGE_NAME }}      
