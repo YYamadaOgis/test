@@ -6,7 +6,7 @@ on:
       - release
     types:
       - closed
-
+permissions: write-all
 env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: test
