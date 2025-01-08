@@ -40,13 +40,14 @@ jobs:
         id: build-image
         run: |
           docker compose -f docker-compose.yml build
-          docker compose images | awk 'NR>1 {print $2}' | xargs -I {} echo "REPONAME={}" >> $GITHUB_ENV
+          IMAGEINFO=$(docker compose images | awk 'NR>1 {print $2}') 
+          echo "IMAGEINFO=$IMAGEINFO" >> $GITHUB_ENV
       # add tags docker image 
       - name: add tags docker image
         id: addtags-image
         run: |
-          docker tag $REPONAME $TAG1
-          docker tag $REPONAME $TAG2
+          docker tag $IMAGEINFO $TAG1
+          docker tag $IMAGEINFO $TAG2
       # push docker image 
       - name: push docker image
         id: push-image
