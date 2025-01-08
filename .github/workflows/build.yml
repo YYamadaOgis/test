@@ -44,7 +44,7 @@ jobs:
       - name: get docker image id
         id: getid-image
         run: |
-          docker images | awk 'NR>1 {print $3} | xargs -I {} echo "IMAGEINFO={}" >> $GITHUB_ENV
+          docker images | awk 'NR>1 {print $3}' | xargs -I {} echo "IMAGEINFO={}" >> $GITHUB_ENV
       # add tags docker image 
       - name: add tags docker image
         id: addtags-image
