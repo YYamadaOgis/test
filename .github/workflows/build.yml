@@ -40,15 +40,15 @@ jobs:
         id: build-image
         run: |
           docker compose -f docker-compose.yml build
-          docker images
-      # # add tags docker image 
-      # - name: add tags docker image
-      #   id: addtags-image
-      #   run: |
-      #     docker tag $TAG1
-      #     docker tag $TAG2
-      # # push docker image 
-      # - name: push docker image
-      #   id: push-image
-      #   run: |
-      #     docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}      
+          docker compose images | awk 'NR>1 {print $2}' | xargs -I{} echo "REPONAME={}" >> $GITHUB_ENV
+      # add tags docker image 
+      - name: add tags docker image
+        id: addtags-image
+        run: |
+          docker tag $REPONAME $TAG1
+          docker tag $REPONAME $TAG2
+      # push docker image 
+      - name: push docker image
+        id: push-image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}      
