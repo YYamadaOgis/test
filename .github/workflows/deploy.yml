@@ -41,12 +41,17 @@ jobs:
       - name: get docker image id
         id: getid-image
         run: |
+          docker images --digests
           docker images | awk 'NR>1 {print $3}' | xargs -I {} echo "IMAGEINFO={}" >> $GITHUB_ENV
       # get image tags 
       - name: get image tags
         # latest以外のタグを取得
         run: |
-          docker-tags ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }} |  grep -v "latest" | xargs -I {} echo "IMAGETAG={}"  >> $GITHUB_ENV
+          docker inspect  $IMAGEINFO
+      # hello
+      - name: hello
+        run: |
+          echo "hello"
       # # auth aws
       # - name: auth aws
       #   uses: aws-actions/configure-aws-credentials@v4
