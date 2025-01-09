@@ -11,7 +11,7 @@ on:
 
 permissions: read-all
 jobs:
-  push:
+  pull-and-push:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }} # Deploy先に合わせてEnvironmentsを切り替える
     permissions:
@@ -36,11 +36,12 @@ jobs:
       # image pull
       - name: latest image pull 
         run: |
-          docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}:Latest
+          docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}:latest
       # get docker image id
       - name: get docker image id
         id: getid-image
         run: |
+          docker images 
           docker images --digests
           docker images | awk 'NR>1 {print $3}' | xargs -I {} echo "IMAGEINFO={}" >> $GITHUB_ENV
       # get image tags 
