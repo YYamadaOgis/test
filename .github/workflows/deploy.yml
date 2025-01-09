@@ -36,7 +36,7 @@ jobs:
       # image pull
       - name: latest image pull 
         run: |
-          docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}
+          docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}:Latest
       # get docker image id
       - name: get docker image id
         id: getid-image
