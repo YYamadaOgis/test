@@ -6,9 +6,9 @@ on:
         type: choice
         required: true
         options:
-          - 'test'
-          - 'stg'
           - 'prod'
+          - 'stg'
+          - 'test'
       version:
         type: string
         required: true
