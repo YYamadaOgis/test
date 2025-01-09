@@ -1,0 +1,75 @@
+name: RollBack Version Pull and Publish Docker to ECR
+on: 
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        options:
+          - 'test'
+          - 'stg'
+          - 'prod'
+      version:
+        type: string
+        required: true
+        description: 'rollback version'
+
+permissions: read-all
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }} # Deploy先に合わせてEnvironmentsを切り替える
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
+        env:
+          OWNER: '${{ github.repository_owner }}'
+      # login ghcr
+      - name: login to ghcr
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      # image pull
+      - name: image pull 
+        run: |
+          docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}:${{ inputs.version }}
+      # get docker image id
+      - name: get docker image id
+        id: getid-image
+        run: |
+          docker images | awk 'NR>1 {print $3}' | xargs -I {} echo "IMAGEINFO={}" >> $GITHUB_ENV
+      # # auth aws
+      # - name: auth aws
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-region: ${{ vars.REGION }}
+      #     role-to-assume: ${{ secrets.IAMROLE_ARN }}
+      # # ecr login
+      # - name: login to ecr
+      #   uses: aws-actions/amazon-ecr-login@v2
+      #   id: login-ecr # outputs で参照するために id を設定
+      # # add tags docker image 
+      # - name: add tags docker image
+      #   id: addtags-image
+      #   env:
+      #     # ECR レジストリを `aws-actions/amazon-ecr-login` アクションの `outputs.registry` から取得
+      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #   run: |
+      #     docker tag $IMAGEINFO ${{ env.REGISTRY }}/${{ vars.REPOSITORY }}:${{ inputs.version }}
+      #     docker tag $IMAGEINFO ${{ env.REGISTRY }}/${{ vars.REPOSITORY }}:latest
+      # # Push Image
+      # - name: push docker image
+      #   id: push to ecr
+      #   env:
+      #     # ECR レジストリを `aws-actions/amazon-ecr-login` アクションの `outputs.registry` から取得
+      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #   run: |
+      #     docker push ${{ env.REGISTRY }}/${{ vars.REPOSITORY }}
