@@ -47,6 +47,7 @@ jobs:
       - name: get image tags
         # latest以外のタグを取得
         run: |
+          docker-tags ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}
           docker-tags ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }} |  grep -v "latest" | xargs -I {} echo "IMAGETAG={}"  >> $GITHUB_ENV
       # hello
       - name: hello
