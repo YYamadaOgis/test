@@ -30,8 +30,7 @@ jobs:
         id: pr-comment
         run: |
           PRCOM=$(echo "$PULL_REQUEST_BODY" | grep -Po '(?<=tag: )v\d+\.\d+\.\d+')
-          echo "TAG1=ghcr.io/$OWNER_LC/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_ENV
-          echo "TAG2=ghcr.io/$OWNER_LC/${{ env.IMAGE_NAME }}:$PRCOM" >> $GITHUB_ENV
+          echo "TAG1=ghcr.io/$OWNER_LC/${{ env.IMAGE_NAME }}:$PRCOM" >> $GITHUB_ENV
 
       # login ghcr
       - name: login to ghcr
@@ -55,10 +54,8 @@ jobs:
         id: addtags-image
         run: |
           docker tag $IMAGEINFO $TAG1
-          docker tag $IMAGEINFO $TAG2
       # push docker image 
       - name: push docker image
         id: push-image
         run: |
           docker push $TAG1
-          docker push $TAG2
