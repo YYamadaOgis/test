@@ -3,11 +3,12 @@ on:
   workflow_dispatch:
     inputs:
       environment:
+        type: choice
         required: true
         options:
-          - 'test'
-          - 'stg'
           - 'prod'
+          - 'stg'
+          - 'test'
 
 permissions: read-all
 jobs:
