@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
+        type: choice
         required: true
         options:
           - 'test'
@@ -15,7 +16,7 @@ on:
 
 permissions: read-all
 jobs:
-  push:
+  pull-and-push-for-rollback:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }} # Deploy先に合わせてEnvironmentsを切り替える
     permissions:
