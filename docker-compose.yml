@@ -3,5 +3,5 @@ services:
     build: .
     tty: true
   app02:
-    buil: ./python
+    build: ./python
     tty: true
