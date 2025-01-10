@@ -55,8 +55,8 @@ jobs:
             image_id=$(echo $line | awk '{print $1}')
             image_name=$(echo $line | awk '{print $2}')
 
-            latest_tag="ghcr.io/${{ github.repository_owner }}/${image_name}:latest"
-            version_tag="ghcr.io/${{ github.repository_owner }}/${image_name}:${{ env.IMAGEVERSION }}"
+            latest_tag="ghcr.io/${{ env.OWNER_LC }}/${image_name}:latest"
+            version_tag="ghcr.io/${{ env.OWNER_LC }}/${image_name}:${{ env.IMAGEVERSION }}"
 
             docker tag "$image_id" "$latest_tag"
             docker tag "$image_id" "$version_tag"
