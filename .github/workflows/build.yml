@@ -29,10 +29,7 @@ jobs:
       - name: Geterate Tags From PR Comments
         id: pr-comment
         run: |
-          PRCOM=$(echo "$PULL_REQUEST_BODY" | grep -Po '(?<=tag: )v\d+\.\d+\.\d+')
-          echo "TAG1=ghcr.io/$OWNER_LC/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_ENV
-          echo "TAG2=ghcr.io/$OWNER_LC/${{ env.IMAGE_NAME }}:$PRCOM" >> $GITHUB_ENV
-
+          echo "$PULL_REQUEST_BODY" | grep -Po '(?<=tag: )v\d+\.\d+\.\d+' | xargs -I {} echo "IMAGEVERSION={}" >> $GITHUB_ENV
       # login ghcr
       - name: login to ghcr
         uses: docker/login-action@v3
@@ -45,20 +42,25 @@ jobs:
         id: build-image
         run: |
           docker compose -f docker-compose.yml build
-      # get docker image id
-      - name: get docker image id
-        id: getid-image
+      # get docker image id and repo
+      - name: get docker image id and repo
+        id: get-idrepo-image
         run: |
-          docker images | awk 'NR>1 {print $3}' | xargs -I {} echo "IMAGEINFO={}" >> $GITHUB_ENV
-      # add tags docker image 
-      - name: add tags docker image
-        id: addtags-image
+          docker images --format "{{.ID}} {{.Repository}}" | tee image_list.txt
+      # add tags and push docker image 
+      - name: add tags and push docker image
+        id: addtags-and-push-image
         run: |
-          docker tag $IMAGEINFO $TAG1
-          docker tag $IMAGEINFO $TAG2
-      # push docker image 
-      - name: push docker image
-        id: push-image
-        run: |
-          docker push $TAG1
-          docker push $TAG2
+          while IFS= read -r line; do
+            image_id=$(echo $line | awk '{print $1}')
+            image_name=$(echo $line | awk '{print $2}')
+
+            latest_tag="ghcr.io/${{ github.repository_owner }}/${image_name}:latest"
+            version_tag="ghcr.io/${{ github.repository_owner }}/${image_name}:${{ env.IMAGEVERSION }}"
+
+            docker tag "$image_id" "$latest_tag"
+            docker tag "$image_id" "$version_tag"
+
+            docker push "$latest_tag"
+            docker push "$version_tag"
+          done < image_list.txt
