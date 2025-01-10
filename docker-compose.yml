@@ -3,5 +3,5 @@ services:
     build: .
     tty: true
   app02:
-    image: python:3.10 
+    buil: .
     tty: true
