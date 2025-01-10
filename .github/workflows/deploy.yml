@@ -42,7 +42,7 @@ jobs:
       - name: get docker image id
         id: getid-image
         run: |
-          docker images 
+          docker images --all
           docker images --digests
           docker images | awk 'NR>1 {print $3}' | xargs -I {} echo "IMAGEINFO={}" >> $GITHUB_ENV
           docker images --digests|  awk 'NR>1 {print $3}' | xargs -I {} echo "DIGEST={}" >> $GITHUB_ENV
@@ -57,7 +57,7 @@ jobs:
       - name: image repull 
         run: |
           docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}@${{ env.DIGEST }}
-          docker images
+          docker images --all
       # hello
       - name: hello
         run: |
