@@ -1,4 +1,7 @@
 services:
-  app:
+  app01:
+    build: .
+    tty: true
+  app02:
     build: .
     tty: true
