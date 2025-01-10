@@ -56,7 +56,7 @@ jobs:
       # image pull
       - name: image repull 
         run: |
-          docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}@$IMAGEINFO
+          docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}@${{ env.DIGEST }}
           docker images
       # hello
       - name: hello
