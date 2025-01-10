@@ -9,7 +9,7 @@ on:
 permissions: write-all
 env:
   # github.repository as <account>/<repo>
-  IMAGE_NAME: test
+  PROJECT_NAME: sample
   PULL_REQUEST_BODY: "${{ github.event.pull_request.body }}"
 
 jobs:
@@ -41,7 +41,7 @@ jobs:
       - name: build docker image
         id: build-image
         run: |
-          docker compose -f docker-compose.yml build
+          docker compose -p ${{ env.PROJECT_NAME }} -f docker-compose.yml build
       # get docker image id and repo
       - name: get docker image id and repo
         id: get-idrepo-image
