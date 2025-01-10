@@ -1,4 +1,7 @@
 services:
-  app:
+  app01:
     build: .
+    tty: true
+  app02:
+    image: python:3.10 
     tty: true
