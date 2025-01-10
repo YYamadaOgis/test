@@ -45,6 +45,7 @@ jobs:
           docker images 
           docker images --digests
           docker images | awk 'NR>1 {print $3}' | xargs -I {} echo "IMAGEINFO={}" >> $GITHUB_ENV
+          docker images --digests|  awk 'NR>1 {print $3}' | xargs -I {} echo "DIGEST={}" >> $GITHUB_ENV
       - name: get tags for image with latest tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,6 +53,11 @@ jobs:
         run: |
           curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
           https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/${{ vars.IMAGE_NAME }}/versions
+      # image pull
+      - name: image repull 
+        run: |
+          docker pull ghcr.io/$OWNER_LC/${{ vars.IMAGE_NAME }}@$IMAGEINFO
+          docker images
       # hello
       - name: hello
         run: |
