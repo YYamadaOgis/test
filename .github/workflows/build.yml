@@ -53,7 +53,7 @@ jobs:
       - name: get docker image id and repo
         id: get-idrepo-image
         run: |
-          docker images --format "{{.ID}} {{.Repository}}" | tee image_list.txt
+          docker images --filter reference!=moby/buildkit --format "{{.ID}} {{.Repository}}" | tee image_list.txt
       # add tags and push docker image 
       - name: add tags and push docker image
         id: addtags-and-push-image
