@@ -44,6 +44,7 @@ jobs:
       - name: build with buildx
         uses: docker/build-push-action@v4
         with:
+          load: true
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
