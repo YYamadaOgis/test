@@ -58,8 +58,8 @@ jobs:
         id: get-idrepo-image
         run: |
           docker images
-          docker images | grep -v "moby/buildkit"
-          docker images --format "{{.ID}} {{.Repository}}" | grep -v "moby/buildkit" |tee image_list.txt
+          docker images | grep ${{ env.PROJECT_NAME }}*
+          docker images --format "{{.ID}} {{.Repository}}" | grep ${{ env.PROJECT_NAME }}* |tee image_list.txt
       # add tags and push docker image 
       - name: add tags and push docker image
         id: addtags-and-push-image
