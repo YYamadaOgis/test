@@ -37,9 +37,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # 1. Buildxのセットアップ
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/build-push-action@v4
+      # setup buildx
+      - name: setup buildx
+        uses: docker/setup-buildx-action@v2
+      # build with buildx
+      - name: build with buildx
+        uses: docker/build-push-action@v4
         with:
           context: .
           cache-from: type=gha
@@ -54,8 +57,8 @@ jobs:
         id: get-idrepo-image
         run: |
           docker images
-          docker images --filter=reference!=moby/buildkit
-          docker images --filter=reference!=moby/buildkit --format "{{.ID}} {{.Repository}}" | tee image_list.txt
+          docker images | grep -v "moby/buildkit"
+          docker images --format "{{.ID}} {{.Repository}}" | grep -v "moby/buildkit" |tee image_list.txt
       # add tags and push docker image 
       - name: add tags and push docker image
         id: addtags-and-push-image
