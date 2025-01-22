@@ -83,9 +83,10 @@ jobs:
           imagename_list=()
           while IFS= read -r line; do
             image_name=$(echo $line | awk '{print $2}')
-            imagename_list+=(${image_name})
+            imagename_list+=("${image_name}")
           done < image_list.txt  
-          docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${imagename_list}
+          echo $imagename_list[@]
+          docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} $imagename_list[@]
           ls
       - name: save cache 
         id: savecache
