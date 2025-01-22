@@ -57,7 +57,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.PATH_CACHE }}
-          key: ${{ steps.setupcache.outputs.KEY }}
+          key: ${{ steps.setupcache.outputs.KEY }}-
       - name: load docker image if exists
         if: steps.cache.outputs.cache-hit == 'true'
         run: docker load --input ${{ steps.setupcache.outputs.PATH_TAR }}
@@ -80,11 +80,13 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p ${{ env.PATH_CACHE }}
+          image_list = ()
           while IFS= read -r line; do
             image_id=$(echo $line | awk '{print $1}')
             image_name=$(echo $line | awk '{print $2}')
-            docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${image_name}
+            image_list+=${image_name}
           done < image_list.txt  
+          docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${image_list}
           ls
       - name: save cache 
         id: savecache
@@ -92,7 +94,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ env.PATH_CACHE }}
-          key: ${{ steps.setupcache.outputs.KEY }}        
+          key: ${{ steps.setupcache.outputs.KEY }}-        
       # add tags and push docker image 
       - name: add tags and push docker image
         id: addtags-and-push-image
