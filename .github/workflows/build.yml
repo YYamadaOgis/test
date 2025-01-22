@@ -80,13 +80,12 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p ${{ env.PATH_CACHE }}
-          image_list = ()
+          imagename_list=()
           while IFS= read -r line; do
-            image_id=$(echo $line | awk '{print $1}')
             image_name=$(echo $line | awk '{print $2}')
-            image_list+=${image_name}
+            imagename_list+=(${image_name})
           done < image_list.txt  
-          docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${image_list}
+          docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${imagename_list}
           ls
       - name: save cache 
         id: savecache
