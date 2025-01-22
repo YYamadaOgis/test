@@ -68,19 +68,22 @@ jobs:
       - name: build docker image
         id: build-image
         run: |
-           docker compose -p ${{ env.PROJECT_NAME }} -f docker-compose.yml build
-       # save docker image 
-      - name: save docker image
-        id: save-image
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-           docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${{ steps.setupcache.outputs.KEY }}     
+           docker compose -p ${{ env.PROJECT_NAME }} -f docker-compose.yml build   
       # get docker image id and repo
       - name: get docker image id and repo
         id: get-idrepo-image
         run: |
           docker images
           docker images --format "{{.ID}} {{.Repository}}" | tee image_list.txt
+        # save docker image 
+      - name: save docker image
+        id: save-image
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          while IFS= read -r line; do
+            image_name=$(echo $line | awk '{print $2}')
+            docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${image_name}
+          done < image_list.txt  
       # add tags and push docker image 
       - name: add tags and push docker image
         id: addtags-and-push-image
