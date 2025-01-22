@@ -65,6 +65,8 @@ jobs:
       - name: build docker image
         id: build-image
         run: |
+           ls 
+           docker images
            docker compose -p ${{ env.PROJECT_NAME }} -f docker-compose.yml build   
       # get docker image id and repo
       - name: get docker image id and repo
@@ -79,9 +81,11 @@ jobs:
         run: |
           mkdir -p ${{ env.PATH_CACHE }}
           while IFS= read -r line; do
+            image_id=$(echo $line | awk '{print $1}')
             image_name=$(echo $line | awk '{print $2}')
             docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${image_name}
           done < image_list.txt  
+          ls
       - name: save cache 
         id: savecache
         if: steps.cache.outputs.cache-hit != 'true'
