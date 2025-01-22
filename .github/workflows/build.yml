@@ -57,7 +57,7 @@ jobs:
           echo "::set-output name=PATH_TAR::${PATH_TAR}"
       - name: enable cache 
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: ${{ env.PATH_CACHE }}
           key: ${{ steps.setupcache.outputs.KEY }}
@@ -85,6 +85,13 @@ jobs:
             image_name=$(echo $line | awk '{print $2}')
             docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${image_name}
           done < image_list.txt  
+      - name: save cache 
+        id: savecache
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.PATH_CACHE }}
+          key: ${{ steps.setupcache.outputs.KEY }}        
       # add tags and push docker image 
       - name: add tags and push docker image
         id: addtags-and-push-image
