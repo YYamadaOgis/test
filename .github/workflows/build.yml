@@ -80,6 +80,7 @@ jobs:
         id: save-image
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          mkdir -p ${{ env.PATH_CACHE }}
           while IFS= read -r line; do
             image_name=$(echo $line | awk '{print $2}')
             docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${image_name}
