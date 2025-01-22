@@ -38,10 +38,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # setup buildx
-      #- name: setup buildx
-      #  id: buildx
-      #  uses: docker/setup-buildx-action@v2
       - name: setup cache
         id: setupcache
         run: |
@@ -54,8 +50,9 @@ jobs:
           NAME_TAR="${{ env.PROJECT_NAME }}.${VARIANT}.tar"
           PATH_TAR=${{ env.PATH_CACHE }}"/${NAME_TAR}"
           : # 変数を他の run でも使えるように output
+          echo "::set-output name=KEY::${KEY}"
           echo "::set-output name=PATH_TAR::${PATH_TAR}"
-      - name: enable cache 
+      - name: read cache 
         id: cache
         uses: actions/cache/restore@v4
         with:
