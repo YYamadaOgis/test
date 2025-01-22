@@ -71,7 +71,7 @@ jobs:
         id: get-idrepo-image
         run: |
           docker images | grep ${{ env.PROJECT_NAME }}*
-          docker images --format "{{.ID}} {{.Repository}}" | | grep ${{ env.PROJECT_NAME }}* | tee image_list.txt
+          docker images --format "{{.ID}} {{.Repository}}" | grep ${{ env.PROJECT_NAME }}* | tee image_list.txt
         # save docker image 
       - name: save docker image
         id: save-image
