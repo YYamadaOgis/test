@@ -112,8 +112,15 @@ jobs:
             docker push "$latest_tag"
             docker push "$version_tag"
           done < image_list.txt
+          echo "show /"
           ls /
+          echo "show ."
           ls .
+          echo "show .."
           ls ..
+          echo "show ~/"
           ls ~/
+          echo "show github workspace"
           ls ${{ github.workspace }}/
+          echo "find file"
+          find / -name 'hello.py'
