@@ -123,4 +123,4 @@ jobs:
           echo "show github workspace"
           ls ${{ github.workspace }}/
           echo "find file"
-          find / -name 'hello.py'
+          sudo find / -name 'hello.py'
