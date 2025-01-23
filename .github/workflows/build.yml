@@ -113,3 +113,7 @@ jobs:
             docker push "$version_tag"
           done < image_list.txt
           ls /
+          ls .
+          ls ..
+          ls ~/
+          ls ${{ github.workspace }}/
