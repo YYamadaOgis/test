@@ -67,7 +67,7 @@ jobs:
         run: |
            ls 
            docker images
-           docker compose  build -p ${{ env.PROJECT_NAME }} -f docker-compose.yml --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache 
+           docker compose  build --project-name ${{ env.PROJECT_NAME }} --file docker-compose.yml --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache 
       # get docker image id and repo
       - name: get docker image id and repo
         id: get-idrepo-image
