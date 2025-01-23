@@ -38,10 +38,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0
-          cache: true
       - name: setup cache
         id: setupcache
         run: |
@@ -116,3 +112,4 @@ jobs:
             docker push "$latest_tag"
             docker push "$version_tag"
           done < image_list.txt
+          ls /
