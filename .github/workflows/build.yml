@@ -62,7 +62,7 @@ jobs:
           key: ${{ steps.setupcache.outputs.KEY }}-
       - name: load docker image if exists
         if: steps.cache.outputs.cache-hit == 'true'
-        run: docker load --input ${{ steps.setupcache.outputs.PATH_TAR }}
+        run: docker import ${{ steps.setupcache.outputs.PATH_TAR }}
         
       - name: Build the backend image with cache
         uses: docker/build-push-action@v4
@@ -96,7 +96,7 @@ jobs:
             imagename_list+=("${image_name}")
           done < image_list.txt  
           echo "${imagename_list[@]}"
-          docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${imagename_list[@]}
+          docker export --output ${{ steps.setupcache.outputs.PATH_TAR }} ${imagename_list[@]}
       - name: save cache 
         id: savecache
         if: steps.cache.outputs.cache-hit != 'true'
