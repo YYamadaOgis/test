@@ -11,7 +11,7 @@ env:
   # github.repository as <account>/<repo>
   PROJECT_NAME: sample
   PULL_REQUEST_BODY: "${{ github.event.pull_request.body }}"
-  PATH_CACHE: /tmp/docker-img-arch
+  PATH_CACHE: /tmp/.buildx-cache
 
 jobs:
   build-and-push:
@@ -45,55 +45,34 @@ jobs:
           HASH_IMAGE=${{ hashFiles('./Dockerfile') }}
           : # 日付と 7 文字のハッシュ値で合計 13 文字の ID を作成
           VARIANT=$(TZ=UTC-9 date '+%Y%m')${HASH_IMAGE:0:7}
-          KEY="${{ env.PROJECT_NAME }}:${VARIANT}"
+          KEY="${{ env.PROJECT_NAME }}_${VARIANT}"
           : # キャッシュする tar アーカイブ名とパスの設定
           NAME_TAR="${{ env.PROJECT_NAME }}.${VARIANT}.tar"
           PATH_TAR=${{ env.PATH_CACHE }}"/${NAME_TAR}"
           : # 変数を他の run でも使えるように output
           echo "::set-output name=KEY::${KEY}"
           echo "::set-output name=PATH_TAR::${PATH_TAR}"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: read cache 
         id: cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
           path: ${{ env.PATH_CACHE }}
           key: ${{ steps.setupcache.outputs.KEY }}-
-      - name: load docker image if exists
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: docker load --input ${{ steps.setupcache.outputs.PATH_TAR }}
       # build docker image 
       - name: build docker image
         id: build-image
         run: |
            ls 
            docker images
-           docker compose -p ${{ env.PROJECT_NAME }} -f docker-compose.yml build   
+           docker buildx build -f docker-compose.yml --cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache,mode=max
       # get docker image id and repo
       - name: get docker image id and repo
         id: get-idrepo-image
         run: |
           docker images | grep ${{ env.PROJECT_NAME }}*
           docker images --format "{{.ID}} {{.Repository}}" | grep ${{ env.PROJECT_NAME }}* | tee image_list.txt
-        # save docker image 
-      - name: save docker image
-        id: save-image
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ${{ env.PATH_CACHE }}
-          imagename_list=()
-          while IFS= read -r line; do
-            image_name=$(echo $line | awk '{print $2}')
-            imagename_list+=("${image_name}")
-          done < image_list.txt  
-          echo "${imagename_list[@]}"
-          docker save --output ${{ steps.setupcache.outputs.PATH_TAR }} ${imagename_list[@]}
-      - name: save cache 
-        id: savecache
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.PATH_CACHE }}
-          key: ${{ steps.setupcache.outputs.KEY }}-        
       # add tags and push docker image 
       - name: add tags and push docker image
         id: addtags-and-push-image
